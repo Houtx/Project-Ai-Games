@@ -45,6 +45,27 @@
 
 ---
 
+### 2. 🐦 AI Flappy Bird - 自动寻路版
+
+**算法**: 基于预判的贪婪算法 + 轨迹预测
+
+**特性**:
+- 🎮 双模式游玩 - 手动模式和 AI 托管模式自由切换
+- 🤖 智能 AI 自动避障,实时计算最佳飞行轨迹
+- 👁️ 可视化寻路 - 红色辅助线显示 AI 决策过程
+- ⚙️ 参数可调 - 所有游戏参数都可自定义
+- 🎨 美观界面 - 现代化渐变设计,流畅动画效果
+
+**在线演示**: [点击这里](https://houtx.github.io/Project-Ai-Games/auto-flappy-bird/) | **详细文档**: [README](./auto-flappy-bird/README.md)
+
+**技术亮点**:
+- 预判算法实时计算未来轨迹
+- 安全高度保持机制
+- 实时可视化辅助线
+- 手动/AI 模式无缝切换
+
+---
+
 ## 🚀 快速开始
 
 ### 在线体验
@@ -59,12 +80,18 @@ cd Project-Ai-Games
 ```bash
 # Windows
 start auto-snake/index.html
+# 或
+start auto-flappy-bird/index.html
 
 # macOS
 open auto-snake/index.html
+# 或
+open auto-flappy-bird/index.html
 
 # Linux
 xdg-open auto-snake/index.html
+# 或
+xdg-open auto-flappy-bird/index.html
 ```
 
 ### 部署到 GitHub Pages
@@ -72,7 +99,7 @@ xdg-open auto-snake/index.html
 1. Fork 本仓库
 2. 在仓库设置中启用 GitHub Pages
 3. 选择 `main` 分支作为源
-4. 访问 `https://houtx.github.io/Project-Ai-Games/auto-snake/` 即可在线游玩
+4. 访问 `https://yourusername.github.io/Project-Ai-Games/auto-snake/` 或 `https://yourusername.github.io/Project-Ai-Games/auto-flappy-bird/` 即可在线游玩
 
 ## 📁 项目结构
 
@@ -85,12 +112,15 @@ Project-Ai-Games/
 │   │   ├── game_initial.png
 │   │   └── game_running.png
 │   └── README.md           # 游戏详细文档
+├── auto-flappy-bird/        # AI Flappy Bird 自动寻路版
+│   ├── index.html           # 游戏主文件
+│   └── README.md           # 游戏详细文档
 └── [更多游戏项目...]
 ```
 
 每个游戏项目都是独立的,包含:
 - `index.html` - 完整的游戏代码(HTML + CSS + JavaScript)
-- `screenshots/` - 游戏预览截图
+- `screenshots/` - 游戏预览截图(可选)
 - `README.md` - 游戏详细说明文档
 
 ## 🛠️ 技术栈
@@ -104,13 +134,13 @@ Project-Ai-Games/
 
 ## 🎨 设计理念
 
-所有游戏都遵循统一的设计风格:
+所有游戏都遵循现代化的设计风格:
 
-- **深色科技风格**: 深色背景 + 霓虹色彩
 - **渐变效果**: 使用 CSS 渐变增强视觉效果
-- **发光动画**: 关键元素添加发光效果
+- **流畅动画**: 关键元素添加动画效果
 - **圆角设计**: 柔和的圆角矩形
 - **响应式布局**: 适配不同屏幕尺寸
+- **直观交互**: 清晰的操作提示和反馈
 
 ## 📊 算法展示
 
@@ -121,6 +151,7 @@ Project-Ai-Games/
 | BFS (广度优先搜索) | AI Snake | O(V+E) | 最短路径搜索 |
 | 安全性验证 | AI Snake | O(V+E) | 预测模拟 |
 | 风险评估 | AI Snake | O(1) | 综合多因素计算 |
+| 贪婪算法 + 预判 | AI Flappy Bird | O(1) | 轨迹预测和决策 |
 
 ## 🔮 未来计划
 
@@ -165,7 +196,7 @@ Project-Ai-Games/
 - ✅ 不使用第三方库(纯原生开发)
 - ✅ 包含 AI 算法或智能机制
 - ✅ 提供详细的 README 文档
-- ✅ 包含游戏截图
+- ✅ 包含游戏截图(可选)
 - ✅ 代码注释完善
 
 ## 📝 许可证
