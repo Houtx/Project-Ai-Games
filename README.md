@@ -47,6 +47,11 @@
 
 ### 2. 🐦 AI Flappy Bird - 自动寻路版
 
+<div align="center">
+  <img src="auto-flappy-bird/screenshots/game_initial.png" alt="Flappy Bird 初始界面" width="400"/>
+  <img src="auto-flappy-bird/screenshots/game_running.png" alt="Flappy Bird 运行界面" width="400"/>
+</div>
+
 **算法**: 基于预判的贪婪算法 + 轨迹预测
 
 **特性**:
@@ -114,13 +119,16 @@ Project-Ai-Games/
 │   └── README.md           # 游戏详细文档
 ├── auto-flappy-bird/        # AI Flappy Bird 自动寻路版
 │   ├── index.html           # 游戏主文件
+│   ├── screenshots/         # 游戏截图
+│   │   ├── game_initial.png
+│   │   └── game_running.png
 │   └── README.md           # 游戏详细文档
 └── [更多游戏项目...]
 ```
 
 每个游戏项目都是独立的,包含:
 - `index.html` - 完整的游戏代码(HTML + CSS + JavaScript)
-- `screenshots/` - 游戏预览截图(可选)
+- `screenshots/` - 游戏预览截图
 - `README.md` - 游戏详细说明文档
 
 ## 🛠️ 技术栈
@@ -196,7 +204,7 @@ Project-Ai-Games/
 - ✅ 不使用第三方库(纯原生开发)
 - ✅ 包含 AI 算法或智能机制
 - ✅ 提供详细的 README 文档
-- ✅ 包含游戏截图(可选)
+- ✅ 包含游戏截图
 - ✅ 代码注释完善
 
 ## 📝 许可证

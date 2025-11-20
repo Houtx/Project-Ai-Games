@@ -1,5 +1,10 @@
 # 🐦 Flappy Bird - AI 自动寻路版
 
+<div align="center">
+  <img src="screenshots/game_initial.png" alt="游戏初始界面" width="400"/>
+  <img src="screenshots/game_running.png" alt="游戏运行界面" width="400"/>
+</div>
+
 一个经典的 Flappy Bird 游戏，集成了智能 AI 自动寻路系统。支持手动游玩和 AI 托管两种模式，可以实时切换体验不同的游戏方式。
 
 ## ✨ 项目特色
@@ -38,8 +43,8 @@
 
 ```javascript
 const CONFIG = {
-    gravity: 0.15,       // 重力加速度 - 控制下坠速度
-    jumpVelocity: -2,    // 跳跃初速度 - 控制跳跃高度
+    gravity: 0.2,        // 重力加速度 - 控制下坠速度
+    jumpVelocity: -2.5,  // 跳跃初速度 - 控制跳跃高度
     pipeWidth: 30,       // 管道宽度
     pipeGap: 150,        // 上下管道间的空隙高度
     pipeSpeed: 1,        // 管道移动速度
@@ -81,8 +86,11 @@ const CONFIG = {
 
 ```
 auto-flappy-bird/
-├── index.html       # 游戏主文件（包含所有 HTML/CSS/JavaScript）
-└── README.md        # 项目说明文档
+├── index.html           # 游戏主文件（包含所有 HTML/CSS/JavaScript）
+├── screenshots/         # 游戏截图
+│   ├── game_initial.png # 游戏初始界面
+│   └── game_running.png # 游戏运行界面
+└── README.md           # 项目说明文档
 ```
 
 ## 🎯 功能特性
