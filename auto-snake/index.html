@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动寻路贪吃蛇 - AI Snake</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .info-panel {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+
+        .info-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        #gameCanvas {
+            border: 3px solid rgba(0, 255, 136, 0.3);
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto 20px;
+            background: #0a0a0a;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #startBtn {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            color: #000;
+        }
+
+        #startBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        #resetBtn {
+            background: linear-gradient(45deg, #ff3366, #ff6699);
+            color: #fff;
+        }
+
+        #resetBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 51, 102, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .legend {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 0.85em;
+            color: #aaa;
+        }
+
+        .legend-item {
+            display: inline-block;
+            margin: 0 15px;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🐍 自动寻路贪吃蛇</h1>
+
+        <div class="info-panel">
+            <div class="info-box">
+                <div class="info-label">当前得分</div>
+                <div class="info-value" id="score">0</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">最高分</div>
+                <div class="info-value" id="highScore">0</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">碰撞风险</div>
+                <div class="info-value" id="collisionRisk" style="font-size: 1.5em;">0%</div>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+
+        <div class="controls">
+            <button id="startBtn">开始游戏</button>
+            <button id="resetBtn">重置游戏</button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background: #00ff88;"></span>
+                蛇头
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #00cc66;"></span>
+                蛇身
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #ff3366;"></span>
+                食物
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: rgba(0, 255, 255, 0.3); border: 1px solid #0ff;"></span>
+                规划路径
+            </div>
+        </div>
+
+        <div class="footer">
+            AI 自动寻路 | BFS 算法 | 路径可视化 | 实时风险评估
+        </div>
+    </div>
+
+    <script>
+        // =================================================================
+        // 游戏配置
+        // =================================================================
+        const CONFIG = {
+            GRID_SIZE: 20,           // 每个格子的像素大小
+            COLS: 30,                // 列数
+            ROWS: 20,                // 行数
+            TICK_RATE: 120,          // 游戏速度（毫秒）
+            INITIAL_LENGTH: 3        // 初始蛇长度
+        };
+
+        // =================================================================
+        // 游戏状态
+        // =================================================================
+        let canvas, ctx;
+        let gameState = 'stopped'; // 'stopped', 'running', 'paused'
+        let score = 0;
+        let highScore = localStorage.getItem('snakeHighScore') || 0;
+        let gameLoop = null;
+
+        // 蛇的数据结构
+        let snake = {
+            body: [],         // [{x, y}, ...]
+            direction: { x: 1, y: 0 }
+        };
+
+        // 食物位置
+        let food = { x: 0, y: 0 };
+
+        // 当前规划的路径（用于可视化）
+        let currentPath = [];
+
+        // 吃食物后的缓冲步数（用于优化算法）
+        let stepsAfterEating = 0;
+        const BUFFER_STEPS = 5; // 吃食物后缓冲的步数
+
+        // =================================================================
+        // 初始化
+        // =================================================================
+        function init() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+
+            // 更新最高分显示
+            document.getElementById('highScore').textContent = highScore;
+
+            // 按钮事件
+            document.getElementById('startBtn').addEventListener('click', toggleGame);
+            document.getElementById('resetBtn').addEventListener('click', resetGame);
+
+            // 初始化游戏
+            resetGame();
+        }
+
+        // =================================================================
+        // 游戏控制
+        // =================================================================
+        function toggleGame() {
+            const btn = document.getElementById('startBtn');
+
+            if (gameState === 'stopped' || gameState === 'paused') {
+                gameState = 'running';
+                btn.textContent = '暂停游戏';
+                startGameLoop();
+            } else if (gameState === 'running') {
+                gameState = 'paused';
+                btn.textContent = '继续游戏';
+                stopGameLoop();
+            }
+        }
+
+        function resetGame() {
+            stopGameLoop();
+            gameState = 'stopped';
+            score = 0;
+            document.getElementById('score').textContent = score;
+            document.getElementById('startBtn').textContent = '开始游戏';
+
+            // 初始化蛇（从中间开始,向右移动）
+            const startX = Math.floor(CONFIG.COLS / 4);
+            const startY = Math.floor(CONFIG.ROWS / 2);
+
+            snake.body = [];
+            for (let i = 0; i < CONFIG.INITIAL_LENGTH; i++) {
+                snake.body.push({ x: startX - i, y: startY });
+            }
+            snake.direction = { x: 1, y: 0 };
+
+            // 生成食物
+            generateFood();
+
+            // 清空路径
+            currentPath = [];
+            stepsAfterEating = BUFFER_STEPS; // 初始时不强制缓冲
+
+            // 渲染初始状态
+            render();
+
+            // 更新碰撞风险显示
+            updateCollisionRiskDisplay();
+        }
+
+        function startGameLoop() {
+            if (gameLoop) return;
+            gameLoop = setInterval(update, CONFIG.TICK_RATE);
+        }
+
+        function stopGameLoop() {
+            if (gameLoop) {
+                clearInterval(gameLoop);
+                gameLoop = null;
+            }
+        }
+
+        // =================================================================
+        // 游戏主循环
+        // =================================================================
+        function update() {
+            // 使用 AI 计算下一步方向
+            const nextDirection = calculateNextMove();
+
+            if (nextDirection) {
+                snake.direction = nextDirection;
+            }
+
+            // 计算新的蛇头位置
+            const head = snake.body[0];
+            const newHead = {
+                x: head.x + snake.direction.x,
+                y: head.y + snake.direction.y
+            };
+
+            // 检查是否吃到食物（提前检查以决定碰撞逻辑）
+            const willEat = (newHead.x === food.x && newHead.y === food.y);
+
+            // 检测碰撞
+            // 如果不吃食物,尾巴会移走,所以碰撞检测时可以忽略当前尾巴位置
+            if (checkCollision(newHead, !willEat)) {
+                gameOver();
+                return;
+            }
+
+            // 移动蛇
+            snake.body.unshift(newHead);
+
+            // 检查是否吃到食物
+            if (willEat) {
+                score++;
+                document.getElementById('score').textContent = score;
+
+                // 更新最高分
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('snakeHighScore', highScore);
+                    document.getElementById('highScore').textContent = highScore;
+                }
+
+                generateFood();
+                // 重置缓冲步数,开始缓冲期
+                stepsAfterEating = 0;
+            } else {
+                // 没吃到食物,移除尾巴
+                snake.body.pop();
+                // 增加缓冲步数
+                if (stepsAfterEating < BUFFER_STEPS) {
+                    stepsAfterEating++;
+                }
+            }
+
+            // 更新碰撞风险显示
+            updateCollisionRiskDisplay();
+
+            // 渲染
+            render();
+        }
+
+        // =================================================================
+        // AI 寻路算法核心
+        // =================================================================
+        function calculateNextMove() {
+            const head = snake.body[0];
+            const obstacles = getObstacles();
+
+            // 0. 缓冲期或风险规避
+            // 如果刚吃完食物（缓冲期）,或者处于危险状态,优先往空旷地方走
+            let isRisky = false;
+
+            // 简单的风险检测:如果周围可用空间很少
+            const availableSpaces = getAvailableSpacesAround(head, obstacles);
+            // 如果只有1个或更少的方向可走,且蛇身较长,认为有风险
+            if (availableSpaces <= 1 && snake.body.length > 5) {
+                isRisky = true;
+            }
+
+            // 如果在缓冲期或者有风险,优先寻找最大空间
+            if (stepsAfterEating < BUFFER_STEPS || isRisky) {
+                const bestDir = findLongestPath(head);
+                if (bestDir) {
+                    // 简单验证一下这个方向是否安全
+                    const nextPos = { x: head.x + bestDir.x, y: head.y + bestDir.y };
+                    // 检查碰撞时,假设不吃食物（除非正好撞上食物,那更好）
+                    const isFood = (nextPos.x === food.x && nextPos.y === food.y);
+                    if (!checkCollision(nextPos, !isFood)) {
+                        currentPath = []; // 清除路径显示
+                        return bestDir;
+                    }
+                }
+            }
+
+            // 1. 首先尝试找到一条安全的路径到食物
+            const pathToFood = findSafePath(head, food);
+
+            if (pathToFood && pathToFood.length > 1) {
+                currentPath = pathToFood;
+                const nextPos = pathToFood[1];
+                return {
+                    x: nextPos.x - head.x,
+                    y: nextPos.y - head.y
+                };
+            }
+
+            // 2. 如果没有安全路径到食物,尝试追着尾巴跑
+            const tail = snake.body[snake.body.length - 1];
+            const pathToTail = findPathBFS(head, tail, obstacles);
+
+            if (pathToTail && pathToTail.length > 1) {
+                currentPath = pathToTail;
+                const nextPos = pathToTail[1];
+                return {
+                    x: nextPos.x - head.x,
+                    y: nextPos.y - head.y
+                };
+            }
+
+            // 3. 如果连尾巴都追不到,找一个最长的路径（避免死路）
+            const longestDir = findLongestPath(head);
+            if (longestDir) {
+                currentPath = [];
+                return longestDir;
+            }
+
+            // 4. 实在没办法,随便找一个不会立即死亡的方向
+            const directions = [
+                { x: 0, y: -1 }, // 上
+                { x: 1, y: 0 },  // 右
+                { x: 0, y: 1 },  // 下
+                { x: -1, y: 0 }  // 左
+            ];
+
+            for (const dir of directions) {
+                const nextPos = {
+                    x: head.x + dir.x,
+                    y: head.y + dir.y
+                };
+                if (!checkCollision(nextPos, true)) {
+                    currentPath = [];
+                    return dir;
+                }
+            }
+
+            // 真的无路可走了
+            return snake.direction;
+        }
+
+        // =================================================================
+        // 碰撞检测
+        // =================================================================
+        function checkCollision(pos, ignoreTail = false) {
+            // 检查是否撞墙
+            if (pos.x < 0 || pos.x >= CONFIG.COLS ||
+                pos.y < 0 || pos.y >= CONFIG.ROWS) {
+                return true;
+            }
+
+            // 检查是否撞到自己
+            // 如果 ignoreTail 为 true,则不检查最后一个身体段（因为移动后它会消失）
+            const len = ignoreTail ? snake.body.length - 1 : snake.body.length;
+            for (let i = 0; i < len; i++) {
+                if (pos.x === snake.body[i].x && pos.y === snake.body[i].y) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // =================================================================
+        // 碰撞概率计算
+        // =================================================================
+        function calculateCollisionRisk() {
+            const head = snake.body[0];
+            const obstacles = getObstacles();
+
+            // 计算四个方向的可用性
+            const directions = [
+                { x: 0, y: -1 }, // 上
+                { x: 1, y: 0 },  // 右
+                { x: 0, y: 1 },  // 下
+                { x: -1, y: 0 }  // 左
+            ];
+
+            let blockedDirections = 0;
+            let nearWallCount = 0;
+            let nearBodyCount = 0;
+
+            // 检查每个方向
+            for (const dir of directions) {
+                const nextPos = {
+                    x: head.x + dir.x,
+                    y: head.y + dir.y
+                };
+
+                // 检查是否撞墙
+                if (nextPos.x < 0 || nextPos.x >= CONFIG.COLS ||
+                    nextPos.y < 0 || nextPos.y >= CONFIG.ROWS) {
+                    blockedDirections++;
+                    nearWallCount++;
+                    continue;
+                }
+
+                // 检查是否撞到身体
+                if (obstacles.has(`${nextPos.x},${nextPos.y}`)) {
+                    blockedDirections++;
+                    nearBodyCount++;
+                }
+            }
+
+            // 计算可达空间
+            const reachableSpaces = countReachableSpaces(head);
+            const maxSpaces = CONFIG.COLS * CONFIG.ROWS;
+            const spaceRatio = reachableSpaces / maxSpaces;
+
+            // 综合计算风险值
+            let risk = 0;
+
+            // 1. 被阻挡方向的影响 (0-40分)
+            risk += (blockedDirections / 4) * 40;
+
+            // 2. 可达空间的影响 (0-30分)
+            risk += (1 - spaceRatio) * 30;
+
+            // 3. 蛇身长度的影响 (0-20分)
+            const lengthRatio = snake.body.length / (CONFIG.COLS * CONFIG.ROWS);
+            risk += lengthRatio * 20;
+
+            // 4. 靠近墙壁的影响 (0-10分)
+            risk += (nearWallCount / 4) * 10;
+
+            // 确保风险值在0-100之间
+            risk = Math.min(100, Math.max(0, risk));
+
+            return Math.round(risk);
+        }
+
+        function updateCollisionRiskDisplay() {
+            const risk = calculateCollisionRisk();
+            const riskElement = document.getElementById('collisionRisk');
+            riskElement.textContent = risk + '%';
+
+            // 根据风险等级改变颜色
+            if (risk < 30) {
+                riskElement.style.color = '#00ff88'; // 绿色 - 安全
+                riskElement.style.textShadow = '0 0 10px rgba(0, 255, 136, 0.5)';
+            } else if (risk < 60) {
+                riskElement.style.color = '#ffaa00'; // 橙色 - 警告
+                riskElement.style.textShadow = '0 0 10px rgba(255, 170, 0, 0.5)';
+            } else {
+                riskElement.style.color = '#ff3366'; // 红色 - 危险
+                riskElement.style.textShadow = '0 0 10px rgba(255, 51, 102, 0.5)';
+            }
+
+            // 添加脉冲动画效果(高风险时)
+            if (risk >= 70) {
+                riskElement.style.animation = 'pulse 0.5s ease-in-out infinite';
+            } else {
+                riskElement.style.animation = 'none';
+            }
+        }
+
+        // =================================================================
+        // 寻路辅助函数
+        // =================================================================
+        function getObstacles() {
+            const obstacles = new Set();
+
+            // 蛇身作为障碍物（不包括尾巴,因为下一步尾巴会移动）
+            for (let i = 0; i < snake.body.length - 1; i++) {
+                const segment = snake.body[i];
+                obstacles.add(`${segment.x},${segment.y}`);
+            }
+
+            return obstacles;
+        }
+
+        function findPathBFS(start, target, obstacles) {
+            const queue = [[start]];
+            const visited = new Set();
+            visited.add(`${start.x},${start.y}`);
+
+            const directions = [
+                { x: 0, y: -1 },
+                { x: 1, y: 0 },
+                { x: 0, y: 1 },
+                { x: -1, y: 0 }
+            ];
+
+            while (queue.length > 0) {
+                const path = queue.shift();
+                const current = path[path.length - 1];
+
+                if (current.x === target.x && current.y === target.y) {
+                    return path;
+                }
+
+                for (const dir of directions) {
+                    const next = {
+                        x: current.x + dir.x,
+                        y: current.y + dir.y
+                    };
+
+                    const key = `${next.x},${next.y}`;
+
+                    if (next.x < 0 || next.x >= CONFIG.COLS ||
+                        next.y < 0 || next.y >= CONFIG.ROWS) {
+                        continue;
+                    }
+
+                    if (visited.has(key) || obstacles.has(key)) {
+                        continue;
+                    }
+
+                    visited.add(key);
+                    queue.push([...path, next]);
+                }
+            }
+
+            return null;
+        }
+
+        function findSafePath(start, target) {
+            const obstacles = getObstacles();
+            const path = findPathBFS(start, target, obstacles);
+
+            if (!path) return null;
+
+            // 模拟走这条路径后,蛇能否继续找到尾巴
+            // 这是一个简化的安全性检查
+            const simulatedSnake = snake.body.map(seg => ({ ...seg }));
+
+            for (let i = 1; i < path.length; i++) {
+                simulatedSnake.unshift({ ...path[i] });
+                if (i < path.length - 1) {
+                    simulatedSnake.pop();
+                }
+            }
+
+            // 检查到达食物后,能否找到尾巴
+            const newObstacles = new Set();
+            for (let i = 0; i < simulatedSnake.length - 1; i++) {
+                newObstacles.add(`${simulatedSnake[i].x},${simulatedSnake[i].y}`);
+            }
+
+            const tail = simulatedSnake[simulatedSnake.length - 1];
+            const pathToTail = findPathBFS(simulatedSnake[0], tail, newObstacles);
+
+            return pathToTail ? path : null;
+        }
+
+        function findLongestPath(start) {
+            const directions = [
+                { x: 0, y: -1 },
+                { x: 1, y: 0 },
+                { x: 0, y: 1 },
+                { x: -1, y: 0 }
+            ];
+
+            let bestDir = null;
+            let maxSpaces = -1;
+
+            for (const dir of directions) {
+                const next = {
+                    x: start.x + dir.x,
+                    y: start.y + dir.y
+                };
+
+                if (checkCollision(next, true)) {
+                    continue;
+                }
+
+                const spaces = countReachableSpaces(next);
+                if (spaces > maxSpaces) {
+                    maxSpaces = spaces;
+                    bestDir = dir;
+                }
+            }
+
+            return bestDir;
+        }
+
+        function countReachableSpaces(start) {
+            const obstacles = getObstacles();
+            const visited = new Set();
+            const queue = [start];
+            visited.add(`${start.x},${start.y}`);
+
+            const directions = [
+                { x: 0, y: -1 },
+                { x: 1, y: 0 },
+                { x: 0, y: 1 },
+                { x: -1, y: 0 }
+            ];
+
+            let count = 0;
+            const maxSteps = 20; // 限制搜索深度
+
+            while (queue.length > 0 && count < maxSteps) {
+                const current = queue.shift();
+                count++;
+
+                for (const dir of directions) {
+                    const next = {
+                        x: current.x + dir.x,
+                        y: current.y + dir.y
+                    };
+
+                    const key = `${next.x},${next.y}`;
+
+                    if (next.x < 0 || next.x >= CONFIG.COLS ||
+                        next.y < 0 || next.y >= CONFIG.ROWS) {
+                        continue;
+                    }
+
+                    if (visited.has(key) || obstacles.has(key)) {
+                        continue;
+                    }
+
+                    visited.add(key);
+                    queue.push(next);
+                }
+            }
+
+            return count;
+        }
+
+        function getAvailableSpacesAround(pos, obstacles) {
+            const directions = [
+                { x: 0, y: -1 },
+                { x: 1, y: 0 },
+                { x: 0, y: 1 },
+                { x: -1, y: 0 }
+            ];
+
+            let count = 0;
+            for (const dir of directions) {
+                const next = {
+                    x: pos.x + dir.x,
+                    y: pos.y + dir.y
+                };
+
+                if (next.x >= 0 && next.x < CONFIG.COLS &&
+                    next.y >= 0 && next.y < CONFIG.ROWS &&
+                    !obstacles.has(`${next.x},${next.y}`)) {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        // =================================================================
+        // 食物生成
+        // =================================================================
+        function generateFood() {
+            const occupiedPositions = new Set();
+            snake.body.forEach(segment => {
+                occupiedPositions.add(`${segment.x},${segment.y}`);
+            });
+
+            let newFood;
+            do {
+                newFood = {
+                    x: Math.floor(Math.random() * CONFIG.COLS),
+                    y: Math.floor(Math.random() * CONFIG.ROWS)
+                };
+            } while (occupiedPositions.has(`${newFood.x},${newFood.y}`));
+
+            food = newFood;
+        }
+
+        // =================================================================
+        // 游戏结束
+        // =================================================================
+        function gameOver() {
+            stopGameLoop();
+            gameState = 'stopped';
+            document.getElementById('startBtn').textContent = '重新开始';
+
+            // 在画布上显示游戏结束
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#ff3366';
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Game Over!', canvas.width / 2, canvas.height / 2 - 30);
+
+            ctx.fillStyle = '#00ff88';
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText(`得分: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+        }
+
+        // =================================================================
+        // 渲染
+        // =================================================================
+        function render() {
+            // 清空画布
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制网格（可选）
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= CONFIG.COLS; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * CONFIG.GRID_SIZE, 0);
+                ctx.lineTo(i * CONFIG.GRID_SIZE, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i <= CONFIG.ROWS; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, i * CONFIG.GRID_SIZE);
+                ctx.lineTo(canvas.width, i * CONFIG.GRID_SIZE);
+                ctx.stroke();
+            }
+
+            // 绘制规划路径
+            if (currentPath.length > 1) {
+                ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(
+                    currentPath[0].x * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2,
+                    currentPath[0].y * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2
+                );
+                for (let i = 1; i < currentPath.length; i++) {
+                    ctx.lineTo(
+                        currentPath[i].x * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2,
+                        currentPath[i].y * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2
+                    );
+                }
+                ctx.stroke();
+            }
+
+            // 绘制食物
+            ctx.fillStyle = '#ff3366';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ff3366';
+            drawRoundedRect(
+                food.x * CONFIG.GRID_SIZE + 2,
+                food.y * CONFIG.GRID_SIZE + 2,
+                CONFIG.GRID_SIZE - 4,
+                CONFIG.GRID_SIZE - 4,
+                5
+            );
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // 绘制蛇
+            snake.body.forEach((segment, index) => {
+                if (index === 0) {
+                    // 蛇头
+                    ctx.fillStyle = '#00ff88';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#00ff88';
+                } else {
+                    // 蛇身
+                    ctx.fillStyle = '#00cc66';
+                    ctx.shadowBlur = 0;
+                }
+
+                drawRoundedRect(
+                    segment.x * CONFIG.GRID_SIZE + 1,
+                    segment.y * CONFIG.GRID_SIZE + 1,
+                    CONFIG.GRID_SIZE - 2,
+                    CONFIG.GRID_SIZE - 2,
+                    4
+                );
+                ctx.fill();
+            });
+
+            ctx.shadowBlur = 0;
+        }
+
+        function drawRoundedRect(x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        // =================================================================
+        // 启动游戏
+        // =================================================================
+        window.addEventListener('load', init);
+    </script>
+</body>
+
+</html>
