@@ -81,23 +81,7 @@ git clone https://github.com/Houtx/Project-Ai-Games.git
 cd Project-Ai-Games
 ```
 
-2. 选择一个游戏,在浏览器中打开对应的 `index.html` 文件:
-```bash
-# Windows
-start auto-snake/index.html
-# 或
-start auto-flappy-bird/index.html
-
-# macOS
-open auto-snake/index.html
-# 或
-open auto-flappy-bird/index.html
-
-# Linux
-xdg-open auto-snake/index.html
-# 或
-xdg-open auto-flappy-bird/index.html
-```
+2. 选择一个游戏,在浏览器中打开对应的 `index.html` 文件。
 
 ### 部署到 GitHub Pages
 
@@ -107,24 +91,6 @@ xdg-open auto-flappy-bird/index.html
 4. 访问 `https://yourusername.github.io/Project-Ai-Games/auto-snake/` 或 `https://yourusername.github.io/Project-Ai-Games/auto-flappy-bird/` 即可在线游玩
 
 ## 📁 项目结构
-
-```
-Project-Ai-Games/
-├── README.md                 # 项目总说明文档
-├── auto-snake/              # AI 自动寻路贪吃蛇
-│   ├── index.html           # 游戏主文件
-│   ├── screenshots/         # 游戏截图
-│   │   ├── game_initial.png
-│   │   └── game_running.png
-│   └── README.md           # 游戏详细文档
-├── auto-flappy-bird/        # AI Flappy Bird 自动寻路版
-│   ├── index.html           # 游戏主文件
-│   ├── screenshots/         # 游戏截图
-│   │   ├── game_initial.png
-│   │   └── game_running.png
-│   └── README.md           # 游戏详细文档
-└── [更多游戏项目...]
-```
 
 每个游戏项目都是独立的,包含:
 - `index.html` - 完整的游戏代码(HTML + CSS + JavaScript)
@@ -161,16 +127,6 @@ Project-Ai-Games/
 | 风险评估 | AI Snake | O(1) | 综合多因素计算 |
 | 贪婪算法 + 预判 | AI Flappy Bird | O(1) | 轨迹预测和决策 |
 
-## 🔮 未来计划
-
-- [ ] **AI 五子棋** - Minimax 算法 + Alpha-Beta 剪枝
-- [ ] **AI 扫雷** - 概率计算 + 逻辑推理
-- [ ] **AI 俄罗斯方块** - 遗传算法优化
-- [ ] **AI 2048** - 期望值搜索
-- [ ] **AI 迷宫生成器** - DFS + 随机化算法
-- [ ] **AI 推箱子** - A* 寻路算法
-- [ ] **AI 跳棋** - 蒙特卡洛树搜索
-
 ## 💡 学习资源
 
 每个游戏项目都包含:
@@ -193,7 +149,7 @@ Project-Ai-Games/
 ### 贡献步骤:
 
 1. Fork 本仓库
-2. 创建新的游戏文件夹 `your-game/`
+2. 创建新的游戏文件夹 `game-name/`
 3. 开发游戏并添加 README.md
 4. 在项目根目录的 README.md 中添加游戏介绍
 5. 提交 Pull Request
